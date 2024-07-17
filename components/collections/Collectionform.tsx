@@ -64,7 +64,7 @@ function Collectionform() {
       }
       
     } catch (error) {
-      console.log("[collection_POST", error);
+      console.log("[collection_POST_clientside", error);
       toast.error("Something error, try again")
     }
   };

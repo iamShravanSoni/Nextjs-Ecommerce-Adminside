@@ -5,13 +5,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async(req:NextRequest) => {
     try {
-        const {userId} = auth()
+        // const { userId } = auth()
 
-        if(!userId) {
-            return new NextResponse("Phele sign-in kar", {status:403})
-        }
+        // if (!userId) {
+        // return new NextResponse("Sign-in kar phele", { status: 403 })
+        // }
 
         await connectToDB();
+        console.log("Database connected successfully for POST request");
 
         const { title, description, image} = await req.json()
 
@@ -32,9 +33,21 @@ export const POST = async(req:NextRequest) => {
         return NextResponse.json(newCollection, {status:200})
 
     } catch (error) {
-        console.log("[collections_POST]",error);
+        console.log("[collections_POST_serverside]",error);
         return new NextResponse("Internal Server Error", {status:500})
     }
 }
 
-export default POST
+export const GET = async(req:NextRequest) => {
+    try {
+        await connectToDB();
+
+        const collection = await Collection.find().sort({ createdAt:"desc" })
+
+        return NextResponse.json(collection, {status: 200})
+
+    } catch (error) {
+        console.log("[collection_GET_serverside", error)
+        return new NextResponse("Internal server error", {status:500})
+    }
+}
