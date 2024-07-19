@@ -21,6 +21,7 @@ import { Textarea } from "../ui/textarea";
 import Imageupload from "../custom ui/Imageupload";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Loader from "../custom ui/Loader";
 
 const formSchema = z.object({
   title: z.string().min(2).max(50),

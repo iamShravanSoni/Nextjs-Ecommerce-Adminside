@@ -18,6 +18,12 @@ export const POST = async(req:NextRequest) => {
 
         const existCollection = await Collection.findOne({title});
 
+        if (!title || !image) {
+          return new NextResponse("Title and image are required", {
+            status: 400,
+          });
+        }
+
         if (existCollection) {
             return new NextResponse("Title already exists", {status:400})
         }
