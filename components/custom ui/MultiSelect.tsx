@@ -32,10 +32,10 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
-  console.log(value)
 
   let selected: CollectionType[];
-
+  console.log("value is",value)
+  console.log("selected is", selected)
   if (value.length === 0) {
     selected = [];
   } else {

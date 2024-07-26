@@ -2,10 +2,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
 import { z } from "zod";
-import { Separator } from "../ui/separator";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
+import { Separator } from "../ui/separator";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,20 +14,19 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import Imageupload from "../custom ui/Imageupload";
 import { Textarea } from "../ui/textarea";
+import Imageupload from "../custom ui/Imageupload";
 import Delete from "../custom ui/Delete";
 import MultiText from "../custom ui/MultiText";
 import MultiSelect from "../custom ui/MultiSelect";
+import Loader from "../custom ui/Loader";
 
 const formSchema = z.object({
-  title: z.string().min(2).max(50),
-  description: z.string().min(10).max(200).trim(),
+  title: z.string().min(2).max(20),
+  description: z.string().min(2).max(500).trim(),
   media: z.array(z.string()),
   category: z.string(),
   collections: z.array(z.string()),
@@ -38,13 +38,12 @@ const formSchema = z.object({
 });
 
 interface ProductFormProps {
-  initialData?: ProductType | null; //Must have "?" to make it optional
+  initialData?: ProductType | null;
 }
 
-const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
-
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
+const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [collections, setCollections] = useState<CollectionType[]>([]);
 
   const getCollections = async () => {
@@ -56,7 +55,7 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
       setCollections(data);
       setLoading(false);
     } catch (err) {
-      console.log("[collectionsusedinform_GET_clientside]", err);
+      console.log("[collections_GET]", err);
       toast.error("Something went wrong! Please try again.");
     }
   };
@@ -65,12 +64,15 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
     getCollections();
   }, []);
 
-
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? initialData
+      ? {
+          ...initialData,
+          collections: initialData.collections.map(
+            (collection) => collection._id
+          ),
+        }
       : {
           title: "",
           description: "",
@@ -95,12 +97,9 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
     }
   };
 
-  // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     try {
-      setLoading(true)
+      setLoading(true);
       const url = initialData
         ? `/api/products/${initialData._id}`
         : "/api/products";
@@ -110,22 +109,19 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
       });
       if (res.ok) {
         setLoading(false);
-        toast.success(`Porduct ${initialData ? "updated" : "created successfully"}`);
-        window.location.href = "/products"; //use to refersh specific route
+        toast.success(`Product ${initialData ? "updated" : "created"}`);
+        window.location.href = "/products";
         router.push("/products");
-      } else {
-        setLoading(false);
-        const errorData = await res.json();
-        toast.error(errorData.message || "Something went wrong");
       }
-      
-    } catch (error) {
-      console.log("[products_POST_clientside", error);
-      toast.error("Something error, try again")
+    } catch (err) {
+      console.log("[products_POST]", err);
+      toast.error("Something went wrong! Please try again.");
     }
   };
 
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="p-10">
       {initialData ? (
         <div className="flex items-center justify-between">
@@ -151,11 +147,10 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
                     onKeyDown={handleKeyPress}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-1" />
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="description"
@@ -166,15 +161,14 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
                   <Textarea
                     placeholder="Description"
                     {...field}
-                    rows={7}
+                    rows={5}
                     onKeyDown={handleKeyPress}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-1" />
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="media"
@@ -234,37 +228,6 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
-
-            {collections.length > 0 && (
-              <FormField
-                control={form.control}
-                name="collections"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Collections</FormLabel>
-                    <FormControl>
-                      <MultiSelect
-                        placeholder="Collections"
-                        collections={collections}
-                        value={field.value}
-                        onChange={(_id) =>
-                          field.onChange([...field.value, _id])
-                        }
-                        onRemove={(idToRemove) =>
-                          field.onChange([
-                            ...field.value.filter(
-                              (collectionId) => collectionId !== idToRemove
-                            ),
-                          ])
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-1" />
-                  </FormItem>
-                )}
-              />
-            )}
-
             <FormField
               control={form.control}
               name="category"
@@ -287,17 +250,15 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
               name="tags"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tag</FormLabel>
+                  <FormLabel>Tags</FormLabel>
                   <FormControl>
                     <MultiText
                       placeholder="Tags"
                       value={field.value}
-                      onChange={(tags) =>
-                        field.onChange([...field.value, tags])
-                      }
-                      onRemove={(removeTags) =>
+                      onChange={(tag) => field.onChange([...field.value, tag])}
+                      onRemove={(tagToRemove) =>
                         field.onChange([
-                          ...field.value.filter((tag) => tag !== removeTags),
+                          ...field.value.filter((tag) => tag !== tagToRemove),
                         ])
                       }
                     />
@@ -306,6 +267,35 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
+            {collections.length > 0 && (
+              <FormField
+                control={form.control}
+                name="collections"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Collections</FormLabel>
+                    <FormControl>
+                      <MultiSelect
+                        placeholder="Collections"
+                        collections={collections}
+                        value={field.value}
+                        onChange={(collection) =>
+                          field.onChange([...field.value, collection])
+                        }
+                        onRemove={(collectionToRemove) =>
+                          field.onChange(
+                            field.value.filter(
+                              (collection) => collection !== collectionToRemove
+                            )
+                          )
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-1" />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
@@ -359,15 +349,18 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
               )}
             />
           </div>
-
-          <div className="flex gap-10">
-            <Button type="submit" className="bg-blue-1 text-white">
-              Submit
+          <div className="flex justify-end gap-2">
+            <Button
+              type="submit"
+              className=" bg-gray-500 text-white hover:bg-gray-600"
+              disabled={loading}
+            >
+              Sumbit
             </Button>
             <Button
               type="button"
-              onClick={() => router.push("/collections")}
-              className="bg-blue-1 text-white"
+              className="bg-gray-500 text-white hover:bg-gray-600"
+              onClick={() => router.back()}
             >
               Discard
             </Button>
@@ -376,6 +369,6 @@ const Productform: React.FC<ProductFormProps> = ({ initialData }) => {
       </Form>
     </div>
   );
-}
+};
 
-export default Productform;
+export default ProductForm;

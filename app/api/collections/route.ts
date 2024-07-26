@@ -48,9 +48,9 @@ export const GET = async(req:NextRequest) => {
     try {
         await connectToDB();
 
-        const collection = await Collection.find().sort({ createdAt:"desc" })
+        const collections = await Collection.find().sort({ createdAt:"desc" })
 
-        return NextResponse.json(collection, {status: 200})
+        return NextResponse.json(collections, {status: 200})
 
     } catch (error) {
         console.log("[collection_GET_serverside", error)
