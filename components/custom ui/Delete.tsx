@@ -18,26 +18,28 @@ import { Button } from "../ui/button";
 import toast from "react-hot-toast";
 
 interface DeleteProps {
+  item: string;
   id: string;
 }
 
-const Delete: React.FC<DeleteProps> = ({ id }) => {
+const Delete: React.FC<DeleteProps> = ({ id, item }) => {
   const [loading, setLoading] = useState(false);
 
   const onDelete = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/collections/${id}`, {
+        const itemType = item == "product" ? "products" : "collections"
+        const res = await fetch(`/api/${itemType}/${id}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
         setLoading(false);
-        window.location.href= "/collections"
-        toast.success(`Collection is delete`);
+        window.location.href= `/${itemType}`
+        toast.success(`${item} is delete`);
       }
     } catch (err) {
-      console.log("collection_DELETE_clientside", err);
+      console.log("collectionaAndpProduct_DELETE_clientside", err);
       toast.error("Something went wrong! Please try again.");
     }
   };

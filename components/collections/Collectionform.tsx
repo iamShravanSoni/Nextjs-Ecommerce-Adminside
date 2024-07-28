@@ -13,7 +13,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -33,9 +33,8 @@ interface CollectionFormProps {
 }
 
 const Collectionform: React.FC<CollectionFormProps> = ({ initialData }) => {
-
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -64,7 +63,7 @@ const Collectionform: React.FC<CollectionFormProps> = ({ initialData }) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     try {
-      setLoading(true)
+      setLoading(true);
       const url = initialData
         ? `/api/collections/${initialData._id}`
         : "/api/collections";
@@ -74,7 +73,9 @@ const Collectionform: React.FC<CollectionFormProps> = ({ initialData }) => {
       });
       if (res.ok) {
         setLoading(false);
-        toast.success(`Collection ${initialData ? "updated" : "created successfully"}`);
+        toast.success(
+          `Collection ${initialData ? "updated" : "created successfully"}`
+        );
         window.location.href = "/collections"; //use to refersh specific route
         router.push("/collections");
       } else {
@@ -82,10 +83,9 @@ const Collectionform: React.FC<CollectionFormProps> = ({ initialData }) => {
         const errorData = await res.json();
         toast.error(errorData.message || "Something went wrong");
       }
-      
     } catch (error) {
       console.log("[collection_POST_clientside", error);
-      toast.error("Something error, try again")
+      toast.error("Something error, try again");
     }
   };
 
@@ -94,7 +94,7 @@ const Collectionform: React.FC<CollectionFormProps> = ({ initialData }) => {
       {initialData ? (
         <div className="flex items-center justify-between">
           <p className="text-heading2-bold">Edit Collection</p>
-          <Delete id={initialData._id} />
+          <Delete id={initialData._id} item="collection" />
         </div>
       ) : (
         <p className="text-heading2-bold">Create Collection</p>
@@ -157,21 +157,38 @@ const Collectionform: React.FC<CollectionFormProps> = ({ initialData }) => {
             )}
           />
           <div className="flex gap-10">
-            <Button type="submit" className="bg-blue-1 text-white">
-              Submit
-            </Button>
-            <Button
-              type="button"
-              onClick={() => router.push("/collections")}
-              className="bg-blue-1 text-white"
-            >
-              Discard
-            </Button>
+            {initialData ? (
+              <>
+                <Button type="submit" className="bg-blue-1 text-white">
+                  Update
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => router.push("/collections")}
+                  className="bg-blue-1 text-white"
+                >
+                  Back
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button type="submit" className="bg-blue-1 text-white">
+                  Submit
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => router.push("/collections")}
+                  className="bg-blue-1 text-white"
+                >
+                  Discard
+                </Button>
+              </>
+            )}
           </div>
         </form>
       </Form>
     </div>
   );
-}
+};
 
 export default Collectionform;

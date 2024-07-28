@@ -56,7 +56,7 @@ export const GET = async (req: NextRequest) => {
 
     const products = await Product.find()
       .sort({ createdAt: "desc" })
-      .populate({ path: "collections", model: Collection });
+      .populate({ path: "collections", model: Collection })
 
     return NextResponse.json(products, { status: 200 });
   } catch (err) {

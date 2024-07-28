@@ -86,6 +86,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
           expense: 0.1,
         },
   });
+  
 
   const handleKeyPress = (
     e:
@@ -100,6 +101,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
+      
       const url = initialData
         ? `/api/products/${initialData._id}`
         : "/api/products";
@@ -126,7 +128,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
       {initialData ? (
         <div className="flex items-center justify-between">
           <p className="text-heading2-bold">Edit Product</p>
-          <Delete id={initialData._id} />
+          <Delete id={initialData._id} item="product" />
         </div>
       ) : (
         <p className="text-heading2-bold">Create Product</p>
@@ -350,20 +352,41 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button
-              type="submit"
-              className=" bg-gray-500 text-white hover:bg-gray-600"
-              disabled={loading}
-            >
-              Sumbit
-            </Button>
-            <Button
-              type="button"
-              className="bg-gray-500 text-white hover:bg-gray-600"
-              onClick={() => router.back()}
-            >
-              Discard
-            </Button>
+            {initialData ? (
+              <>
+                <Button
+                  type="submit"
+                  className=" bg-gray-500 text-white hover:bg-gray-600"
+                  disabled={loading}
+                >
+                  Update
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-gray-500 text-white hover:bg-gray-600"
+                  onClick={() => router.back()}
+                >
+                  Back
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  type="submit"
+                  className=" bg-gray-500 text-white hover:bg-gray-600"
+                  disabled={loading}
+                >
+                  Sumbit
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-gray-500 text-white hover:bg-gray-600"
+                  onClick={() => router.back()}
+                >
+                  Discard
+                </Button>
+              </>
+            )}
           </div>
         </form>
       </Form>

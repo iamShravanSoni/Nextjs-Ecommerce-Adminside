@@ -66,6 +66,15 @@ export const DELETE = async (
   try {
     await connectToDB();
 
+    const collection = await Collection.findById(params.collectionId);
+
+    if (!collection) {
+      return new NextResponse(
+        JSON.stringify({ message: "collection not found" }),
+        { status: 404 }
+      );
+    }
+
     await Collection.findByIdAndDelete(params.collectionId);
 
     return new NextResponse("Collection is deleted successfully", {
