@@ -39,13 +39,13 @@ function Collections() {
   ) : (
     <div className="px-10 py-5">
       <div className="flex items-center justify-between">
-        <p className="text-heading2-bold">Collections</p>
+        <p className="text-heading2-bold">Products</p>
         <Button
           className="bg-blue-1 text-white"
           onClick={() => router.push("/products/new")}
         >
           <Plus className="h-4 w-4 mr-2" />
-          Create Collection
+          Create Product
         </Button>
       </div>
       <Separator className="bg-grey-1 my-4" />

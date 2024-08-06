@@ -55,6 +55,7 @@ export const POST = async (
       tags,
       sizes,
       colors,
+      quantity,
     } = await req.json();
 
     if (
@@ -65,7 +66,8 @@ export const POST = async (
       !price ||
       !expense ||
       !sizes ||
-      !colors
+      !colors ||
+      !quantity
     ) {
       return new NextResponse("Not enough data to create a new product", {
         status: 400,
@@ -112,6 +114,7 @@ export const POST = async (
         tags,
         sizes,
         colors,
+        quantity,
       },
       { new: true }
     ).populate({ path: "collections", model: Collection });

@@ -22,6 +22,7 @@ const ProductSchema = new mongoose.Schema(
         return parseFloat(v.toString());
       },
     },
+    quantity: Number,
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
