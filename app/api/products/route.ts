@@ -47,7 +47,7 @@ export const POST = async(req:NextRequest) => {
           colors,
           price,
           expense,
-          quantity,
+          quantity, 
         });
 
         await newProduct.save()
