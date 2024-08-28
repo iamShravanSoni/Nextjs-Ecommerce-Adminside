@@ -3,7 +3,7 @@ import { columns } from "@/components/orderitem/Orderitemcoloumn"
 
 const OrderDetails = async ({ params }: { params: { orderId: string }}) => {
   const res = await fetch(`http://localhost:3000/api/orders/${params.orderId}`);
-  const { orderDetails, customer } = await res.json()
+  const { orderDetails, customer } = await res.json();
 
   const { street, city, state, zipCode, country } =
     orderDetails.shippingAddress;

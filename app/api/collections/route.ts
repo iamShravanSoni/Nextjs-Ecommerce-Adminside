@@ -11,7 +11,7 @@ export const POST = async(req:NextRequest) => {
         // return new NextResponse("Sign-in kar phele", { status: 403 })
         // }
 
-        await connectToDB();
+        await connectToDB();    
         console.log("Database connected successfully for POST request");
 
         const { title, description, image} = await req.json()
