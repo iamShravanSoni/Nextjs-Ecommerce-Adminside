@@ -19,7 +19,14 @@ export const GET = async (
       );
     }
 
-    return NextResponse.json(product, { status: 200 });
+    return new NextResponse(JSON.stringify(product), {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": `${process.env.STORE_URL}`,
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
   } catch (error) {
     console.log("[productDetail_GET_serverside", error);
     return new NextResponse("Internal server error", { status: 500 });

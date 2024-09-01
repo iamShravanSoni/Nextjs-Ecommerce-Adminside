@@ -52,6 +52,16 @@ export const POST = async(req:NextRequest) => {
 
         await newProduct.save()
 
+        if (collections) {
+          for (const collectionId of collections) {
+            const collection = await Collection.findById(collectionId);
+            if (collection) {
+              collection.products.push(newProduct._id);
+              await collection.save();
+            }
+          }
+        }
+
         return new NextResponse(newProduct, {status: 201});
 
     } catch (error) {
