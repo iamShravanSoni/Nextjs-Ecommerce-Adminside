@@ -169,3 +169,6 @@ export const DELETE = async (
     return new NextResponse("Internal server error", { status: 500 });
   }
 };
+
+
+export const dynamic = "force-dynamic";
